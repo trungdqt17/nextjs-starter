@@ -2,6 +2,7 @@
 	"name": "nextjs-starter",
 	"version": "0.1.0",
 	"private": true,
+	"type": "module",
 	"scripts": {
 		"dev": "next dev --turbopack",
 		"build": "next build --turbopack",
@@ -28,6 +29,8 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.2.2",
+		"@commitlint/cli": "^19.8.1",
+		"@commitlint/config-conventional": "^19.8.1",
 		"@tailwindcss/postcss": "^4",
 		"@types/lodash.debounce": "^4.0.9",
 		"@types/node": "^20",
