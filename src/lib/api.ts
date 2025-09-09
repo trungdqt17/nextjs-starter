@@ -1,45 +1,39 @@
-import axios from 'axios';
+import createFetchClient from 'openapi-fetch';
+import createClient from 'openapi-react-query';
+import { env } from '@/env/client';
+import type { paths } from '@/types/openapi';
 
-// Create axios instance with default config
-export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || '/api',
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+// Create openapi-fetch client with default config using validated env vars
+// Note: Only NEXT_PUBLIC_ variables are available on the client
+const fetchClient = createFetchClient<paths>({
+  baseUrl: env.NEXT_PUBLIC_API_URL,
 });
 
-// Request interceptor
-api.interceptors.request.use(
-  (config) => {
+// Add authentication middleware
+fetchClient.use({
+  onRequest({ request }) {
     // Add auth token if available
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      request.headers.set('Authorization', `Bearer ${token}`);
     }
-    return config;
+    return request;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Response interceptor
-api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
+  onResponse({ response }) {
     // Handle common errors
-    if (error.response?.status === 401) {
+    if (response.status === 401) {
       // Handle unauthorized access
       if (typeof window !== 'undefined') {
         localStorage.removeItem('token');
         window.location.href = '/login';
       }
     }
-    return Promise.reject(error);
-  }
-);
+    return response;
+  },
+});
 
-export default api;
+// Create openapi-react-query client
+export const $api = createClient(fetchClient);
+
+// Export the fetch client for direct use if needed
+export const api = fetchClient;
