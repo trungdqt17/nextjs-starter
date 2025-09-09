@@ -52,7 +52,7 @@
 			"biome check --write",
 			"biome format --write"
 		],
-		"*.{md,css}": [
+		"*.css": [
 			"biome format --write"
 		]
 	}
