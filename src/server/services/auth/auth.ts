@@ -13,10 +13,10 @@ import type {
   UseMutationResult,
 } from '@tanstack/react-query';
 import { useMutation } from '@tanstack/react-query';
-import type { BodyType, ErrorType } from '../../lib/fetch-instance';
+import type { BodyType, ErrorType } from '../../../lib/fetch-instance';
 
-import { fetchInstance } from '../../lib/fetch-instance';
-import type { LoginDto, LoginParamsDto } from '../../types/models';
+import { fetchInstance } from '../../../lib/fetch-instance';
+import type { LoginDto, LoginParamsDto } from '../../../types/models';
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 

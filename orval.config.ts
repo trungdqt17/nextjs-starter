@@ -3,7 +3,7 @@ import { defineConfig } from 'orval';
 export default defineConfig({
   api: {
     output: {
-      mode: 'tags',
+      mode: 'tags-split',
       target: 'src/server/services',
       schemas: 'src/types/models',
       client: 'react-query',
@@ -27,6 +27,17 @@ export default defineConfig({
     },
     hooks: {
       afterAllFilesWrite: 'yarn format',
+    },
+  },
+  apiZod: {
+    input: {
+      target: process.env.OPENAPI_SCHEMA || '',
+    },
+    output: {
+      mode: 'tags-split',
+      client: 'zod',
+      target: 'src/server/services',
+      fileExtension: '.zod.ts',
     },
   },
 });
