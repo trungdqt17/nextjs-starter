@@ -1,13 +1,10 @@
 'use client';
 
-import { useId } from 'react';
 import { Button } from '@/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/ui/card';
 import { Input } from '@/ui/input';
 
 export function AuthForm() {
-  console.log('AuthForm', useId());
-
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader className="text-center">
@@ -44,7 +41,7 @@ export function AuthForm() {
             <Input name="confirmPassword" type="password" placeholder="Confirm your password" />
           </div>
 
-          <Button type="submit" className="w-full">
+          <Button type="button" className="w-full">
             Sign In
           </Button>
         </form>
