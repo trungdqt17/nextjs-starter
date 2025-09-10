@@ -1,19 +1,23 @@
 # Next.js Starter Template
 
-A modern, production-ready Next.js starter template with TypeScript, Tailwind CSS, shadcn/ui, TanStack Query, OpenAPI integration, and type-safe environment variables.
+A modern, production-ready Next.js starter template with TypeScript, Tailwind CSS, shadcn/ui, TanStack Query, Orval for OpenAPI code generation, and type-safe environment variables.
 
 ## 🚀 Features
 
-- **Next.js 15** with App Router
+- **Next.js 15** with App Router and Turbopack
+- **React 19** with latest features
 - **TypeScript** for type safety
-- **Tailwind CSS** for styling
-- **shadcn/ui** for beautiful UI components
-- **TanStack Query** for server state management
-- **OpenAPI React Query** for type-safe API calls
+- **Tailwind CSS v4** for modern styling
+- **shadcn/ui** for beautiful, accessible UI components
+- **TanStack Query v5** for powerful server state management
+- **Orval** for automatic OpenAPI TypeScript & React Query generation
 - **@t3-oss/env-nextjs** for validated environment variables
-- **BiomeJS** for linting and formatting
-- **OpenAPI TypeScript** code generation
-- **Organized folder structure** for scalability
+- **BiomeJS** for fast linting and formatting
+- **Docker** support with multi-stage builds
+- **Husky & lint-staged** for git hooks
+- **Commitlint** for conventional commits
+- **Custom hooks** for common patterns
+- **Feature-based folder structure** for scalability
 
 ## 📁 Project Structure
 
@@ -24,35 +28,39 @@ src/
 │   ├── layout.tsx         # Root layout
 │   ├── page.tsx           # Home page
 │   └── favicon.ico        # App icon
-├── env/                   # Environment variable configuration
+├── env/                   # Environment variable validation
 │   ├── client.ts          # Client-side env vars (NEXT_PUBLIC_*)
 │   └── server.ts          # Server-side env vars
 ├── features/              # Feature-based components
-│   ├── auth/              # Authentication components
-│   │   └── auth-form.tsx  # Login/register form
-│   └── user-management/   # User management components
+│   ├── auth/              # Authentication features
+│   │   └── auth-form.tsx  # Sign in/up form component
+│   └── user-management/   # User management features
 │       └── user-management.tsx
 ├── hooks/                 # Custom React hooks
-│   ├── use-boolean.ts     # Boolean state hook
+│   ├── use-boolean.ts     # Boolean state management
 │   ├── use-countdown.ts   # Countdown timer hook
-│   ├── use-counter.ts     # Counter hook
-│   ├── use-debounce-callback.ts
-│   ├── use-interval.ts    # Interval hook
-│   └── use-unmount.ts     # Unmount effect hook
+│   ├── use-counter.ts     # Counter state hook
+│   ├── use-debounce-callback.ts # Debounced callbacks
+│   ├── use-interval.ts    # Interval management
+│   └── use-unmount.ts     # Cleanup on unmount
 ├── lib/                   # Utilities and configuration
-│   ├── api.ts            # OpenAPI React Query client
-│   ├── providers.tsx     # React Query provider
-│   └── utils.ts          # shadcn/ui utilities
-├── server/               # Server-side logic
-│   └── services.ts       # API service functions
-├── types/                # TypeScript type definitions
-│   ├── index.ts          # Common types
-│   ├── model.ts          # Data models
-│   └── openapi.d.ts      # Generated OpenAPI types
-└── ui/                   # shadcn/ui components
-    ├── button.tsx        # Button component
-    ├── card.tsx          # Card component
-    └── input.tsx         # Input component
+│   ├── fetch-instance.ts  # Custom fetch client for Orval
+│   ├── providers.tsx      # TanStack Query provider setup
+│   ├── query-client.ts    # Query client configuration
+│   └── utils.ts           # shadcn/ui utilities
+├── server/                # Generated server-side logic
+│   └── react-query/       # Orval generated React Query hooks
+│       └── auth.ts        # Authentication API hooks
+├── types/                 # TypeScript type definitions
+│   ├── model/             # Generated API models
+│   │   ├── index.ts       # Model exports
+│   │   ├── loginDto.ts    # Login response type
+│   │   ├── loginDtoRole.ts# User role types
+│   │   └── loginParamsDto.ts # Login request type
+└── ui/                    # shadcn/ui components
+    ├── button.tsx         # Button component
+    ├── card.tsx           # Card component
+    └── input.tsx          # Input component
 ```
 
 ## 🛠️ Getting Started
@@ -86,9 +94,11 @@ cp .env.example .env.local
 # See the Environment Variables section below
 ```
 
-4. Generate OpenAPI types (if you have an API):
+4. Generate API types and React Query hooks (if you have an API):
 ```bash
-yarn openapi:gen
+# Set your OpenAPI schema URL
+export OPENAPI_SCHEMA=https://your-api-url/docs-json
+yarn react-query:generate
 ```
 
 5. Start the development server:
@@ -102,13 +112,14 @@ yarn dev
 ## 📜 Available Scripts
 
 - `yarn dev` - Start development server with Turbopack
-- `yarn build` - Build for production
+- `yarn build` - Build for production with Turbopack
 - `yarn start` - Start production server
 - `yarn lint` - Run BiomeJS linting
 - `yarn lint:fix` - Fix linting issues automatically
 - `yarn format` - Format code with BiomeJS
 - `yarn type-check` - Run TypeScript type checking
-- `yarn openapi:gen` - Generate TypeScript types from OpenAPI schema
+- `yarn react-query:generate` - Generate TypeScript types and React Query hooks from OpenAPI schema
+- `yarn prepare` - Setup Husky git hooks
 
 ## 🎨 UI Components
 
@@ -125,56 +136,29 @@ npx shadcn@latest add [component-name]
 
 ## 🔄 API Integration
 
-The template uses **OpenAPI React Query** for type-safe API calls with TanStack Query:
+The template uses **Orval** to automatically generate TypeScript types and TanStack Query hooks from your OpenAPI specification:
 
-### Using React Query Hooks
-
-```tsx
-import { $api } from '@/lib/api';
-
-function UserProfile({ userId }: { userId: number }) {
-  // Type-safe query with auto-completion
-  const { data, error, isLoading } = $api.useQuery('get', '/users/{id}', {
-    params: { 
-      path: { id: userId },
-      header: { "x-app-lang": "en" }
-    },
-  });
-
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
-  
-  return <div>User: {data?.name}</div>;
-}
-```
-
-### Using Mutations
+### Using Generated React Query Hooks
 
 ```tsx
-function CreateUser() {
-  const { mutate: createUser, isPending } = $api.useMutation('post', '/users');
-  
-  const handleCreate = () => {
-    createUser({
-      params: { header: { "x-app-lang": "en" } },
-      body: { name: 'John', email: 'john@example.com' },
-    });
-  };
-
-  return (
-    <button onClick={handleCreate} disabled={isPending}>
-      {isPending ? 'Creating...' : 'Create User'}
-    </button>
-  );
-}
+import { useAuthControllerLogin } from '@/server/react-query/auth';
 ```
+
+### Custom Fetch Instance
+
+The template includes a custom fetch instance with:
+- Authentication middleware
+- Error handling
+- Request/response interceptors
+- Type safety
 
 ### Regenerating API Types
 
-When your API changes, regenerate the TypeScript types:
+When your API changes, regenerate the TypeScript types and hooks:
 
 ```bash
-yarn openapi:gen
+export OPENAPI_SCHEMA=https://your-api-url/docs-json
+yarn react-query:generate
 ```
 
 ## 🌍 Environment Variables
@@ -186,28 +170,27 @@ The template uses **@t3-oss/env-nextjs** for type-safe environment variable vali
 1. Create a `.env.local` file in your project root:
 
 ```bash
-# Server-side variables (secure, not exposed to client)
-DATABASE_URL="postgresql://user:password@localhost:5432/database"
-OPENAI_API_KEY="sk-..."
-NODE_ENV="development"
-
 # Client-side variables (exposed to browser, must have NEXT_PUBLIC_ prefix)
-NEXT_PUBLIC_API_URL="http://localhost:4000/api"
+NEXT_PUBLIC_API_URL="https://your-api-url/api"
 NEXT_PUBLIC_APP_NAME="My App"
 NEXT_PUBLIC_APP_VERSION="1.0.0"
+
+# For development - OpenAPI schema URL for code generation
+OPENAPI_SCHEMA="https://your-api-url/docs-json"
 ```
 
 ### Usage
 
 ```tsx
 import { env } from '@/env/client'; // For client-side components
-import { env } from '@/env/server'; // For server-side code
+import { env } from '@/env/server'; // For server-side code (empty in this template)
 
 // ✅ Type-safe access with auto-completion
-console.log(env.NEXT_PUBLIC_APP_NAME); // "My App"
+console.log(env.NEXT_PUBLIC_APP_NAME); // "Next.js Starter"
+console.log(env.NEXT_PUBLIC_API_URL); // Your API URL
 
 // ✅ Validated at build time - missing variables cause build failures
-// ✅ Client/server separation - server vars throw error if accessed on client
+// ✅ Client/server separation - prevents accidental exposure of secrets
 // ✅ Runtime validation - invalid values are caught early
 ```
 
@@ -219,14 +202,29 @@ console.log(env.NEXT_PUBLIC_APP_NAME); // "My App"
 - **Client/Server Separation**: Prevents accidental exposure of secrets
 - **Self-documenting**: Schema serves as living documentation
 
-## 🧪 Testing
+## 🐳 Docker Support
 
-Testing setup can be added using Vitest and React Testing Library. The project structure supports testing with organized test files.
+The template includes optimized Docker configuration:
 
-## 📝 Code Quality
+```bash
+# Build the Docker image
+docker build -t nextjs-starter .
 
-This template uses BiomeJS for linting and formatting:
+# Run the container
+docker run -p 3000:3000 nextjs-starter
+```
 
+Features:
+- Multi-stage builds for smaller production images
+- Non-root user for security
+- Optimized layer caching
+- Production-ready configuration
+
+## 📝 Code Quality & Git Hooks
+
+This template includes comprehensive code quality tools:
+
+### BiomeJS (Linting & Formatting)
 ```bash
 # Check for issues
 yarn lint
@@ -240,6 +238,20 @@ yarn format
 # Type checking
 yarn type-check
 ```
+
+### Git Hooks (Husky + lint-staged)
+- **Pre-commit**: Automatically formats and lints staged files
+- **Commit-msg**: Validates commit messages using conventional commits
+
+### Conventional Commits
+The template enforces conventional commit messages:
+- `feat:` for new features
+- `fix:` for bug fixes  
+- `docs:` for documentation changes
+- `style:` for formatting changes
+- `refactor:` for code refactoring
+- `test:` for adding tests
+- `chore:` for maintenance tasks
 
 ## 🚀 Deployment
 
