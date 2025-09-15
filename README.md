@@ -7,6 +7,7 @@ A modern, production-ready Next.js starter template with TypeScript, Tailwind CS
 - **Next.js 15** with App Router and Turbopack
 - **React 19** with latest features
 - **TypeScript** for type safety
+- **Typed Routes** with PageProps, LayoutProps, and RouteContext helpers
 - **Tailwind CSS v4** for modern styling
 - **shadcn/ui** for beautiful, accessible UI components
 - **TanStack Query v5** for powerful server state management
@@ -27,6 +28,9 @@ src/
 │   ├── globals.css        # Global styles
 │   ├── layout.tsx         # Root layout
 │   ├── page.tsx           # Home page
+│   ├── example/           # Example dynamic route
+│   │   └── [id]/          # Dynamic segment
+│   │       └── page.tsx   # Typed route example
 │   └── favicon.ico        # App icon
 ├── env/                   # Environment variable validation
 │   ├── client.ts          # Client-side env vars (NEXT_PUBLIC_*)
@@ -120,6 +124,87 @@ yarn dev
 - `yarn type-check` - Run TypeScript type checking
 - `yarn react-query:generate` - Generate TypeScript types and React Query hooks from OpenAPI schema
 - `yarn prepare` - Setup Husky git hooks
+
+## 🛣️ Typed Routes
+
+The template includes **Next.js typed routes** for enhanced TypeScript support:
+
+### Enable Typed Routes
+
+First, enable typed routes in your `next.config.ts`:
+
+```typescript
+import type { NextConfig } from 'next'
+
+const nextConfig: NextConfig = {
+  typedRoutes: true,
+}
+
+export default nextConfig
+```
+
+### Using PageProps Helper
+
+Use the global `PageProps` helper for strongly typed page components:
+
+```tsx
+// Dynamic route: /example/[id]
+export default async function ExamplePage(props: PageProps<'/example/[id]'>) {
+  const { id } = await props.params;
+  const searchParams = await props.searchParams;
+  
+  return (
+    <div>
+      <h1>Example ID: {id}</h1>
+      <p>Search params: {JSON.stringify(searchParams)}</p>
+    </div>
+  );
+}
+```
+
+### Using LayoutProps Helper
+
+For layout components with typed params and named slots:
+
+```tsx
+export default function Layout(props: LayoutProps<'/dashboard'>) {
+  return (
+    <section>
+      {props.children}
+      {/* Named slots appear as typed properties */}
+      {/* {props.analytics} */}
+    </section>
+  );
+}
+```
+
+### Using RouteContext Helper
+
+For API route handlers:
+
+```tsx
+import type { NextRequest } from 'next/server'
+
+export async function GET(_req: NextRequest, ctx: RouteContext<'/api/users/[id]'>) {
+  const { id } = await ctx.params;
+  return Response.json({ id });
+}
+```
+
+### Benefits
+
+- **Type Safety**: Compile-time checking of route parameters
+- **Autocomplete**: IntelliSense support for parameter names  
+- **Refactoring Safety**: Changes to route structure update types automatically
+- **Error Prevention**: Catches typos in parameter names
+
+### Try the Example
+
+Visit `/example/123` to see a working example of typed dynamic routes with:
+- Parameter extraction and display
+- Search parameter handling
+- TypeScript benefits demonstration
+- Interactive examples with different IDs
 
 ## 🎨 UI Components
 

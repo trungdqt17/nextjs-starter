@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { AuthForm } from '@/features/auth/auth-form';
 import { Button } from '@/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/ui/card';
@@ -24,9 +25,11 @@ export default function HomePage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="outline" className="w-full">
-                Explore Routes
-              </Button>
+              <Link href="/example/123">
+                <Button variant="outline" className="w-full">
+                  Dynamic Route Example
+                </Button>
+              </Link>
             </CardContent>
           </Card>
 
